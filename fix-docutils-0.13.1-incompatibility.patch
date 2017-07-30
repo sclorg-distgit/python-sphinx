@@ -1,0 +1,38 @@
+diff --git a/sphinx/writers/html.py b/sphinx/writers/html.py
+index c69c2e0..db927fe 100644
+--- a/sphinx/writers/html.py
++++ b/sphinx/writers/html.py
+@@ -14,6 +14,7 @@ import posixpath
+ import os
+ import copy
+ 
++import docutils
+ from docutils import nodes
+ from docutils.writers.html4css1 import Writer, HTMLTranslator as BaseTranslator
+ 
+@@ -368,8 +369,7 @@ class HTMLTranslator(BaseTranslator):
+             node['uri'] = posixpath.join(self.builder.imgpath,
+                                          self.builder.images[olduri])
+ 
+-        if node['uri'].lower().endswith('svg') or \
+-           node['uri'].lower().endswith('svgz'):
++        if node['uri'].lower().endswith(('svg', 'svgz')):
+             atts = {'src': node['uri']}
+             if node.has_key('width'):
+                 atts['width'] = node['width']
+@@ -408,6 +408,15 @@ class HTMLTranslator(BaseTranslator):
+                         pass
+         BaseTranslator.visit_image(self, node)
+ 
++    # overwritten
++    def depart_image(self, node):
++        if docutils.__version__ >= "0.13":
++            # since docutils-0.13, HTMLWriter does not push context data on visit_image()
++            if node['uri'].lower().endswith(('svg', 'svgz')):
++                self.body.append(self.context.pop())
++        else:
++            self.body.append(self.context.pop())
++
+     def visit_toctree(self, node):
+         # this only happens when formatting a toc from env.tocs -- in this
+         # case we don't want to include the subtree
