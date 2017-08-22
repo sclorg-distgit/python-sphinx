@@ -6,7 +6,7 @@
 
 Name:       %{?scl_prefix}python-sphinx
 Version:    1.2.3
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -24,6 +24,14 @@ Patch1:     html-parser-HTMLParserError-removed.patch
 # Fix incompatibility with docutils 0.13.1
 # Fixed upstream: https://github.com/sphinx-doc/sphinx/pull/3217/
 Patch2:     fix-docutils-0.13.1-incompatibility.patch
+
+# Compatability with pygments 2.1. Backported from upstream:
+# https://github.com/sphinx-doc/sphinx/commit/5574aba60ed76f2bae947722122ac4d71ab8ed5a
+Patch3:     Fix-tests-compatibility-with-pygments-2.1.patch
+
+# Compatability with pygments 2.1.1. Backported from upstream:
+# https://github.com/sphinx-doc/sphinx/commit/50f4862b069d58ade556aad90bd179206f10fdc1
+Patch4:     Fix-tests-compatibility-with-pygments-2.1.1.patch
 
 BuildArch:     noarch
 BuildRequires: %{?scl_prefix}python-devel
@@ -103,6 +111,8 @@ sed '1d' -i sphinx/pycode/pgen2/token.py
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
 
 %build
 %{?scl:scl enable %{scl} "}
@@ -173,7 +183,7 @@ rm -rf %{buildroot}
 %{?scl:scl enable %{scl} - << \EOF}
 # we need to export LC_TYPE because of TPS tests, see rhbz#971422
 export LC_CTYPE="en_US.utf8"
-make test || true
+make test
 %{?scl:EOF}
 %endif
 
@@ -192,6 +202,10 @@ make test || true
 %doc html reST
 
 %changelog
+* Fri Aug 4 2017 Iryna Shcherbina <ishcherb@redhat.com> - 1.2.3 - 3
+- Fix incompatibilities with pygments >= 2.1
+Resolves: rhbz#1464413
+
 * Fri Jun 23 2017 Charalampos Stratakis <cstratak@redhat.com> - 1.2.3-2
 - Fix incompatibility with docutils 0.13.1
 
