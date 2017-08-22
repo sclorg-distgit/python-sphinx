@@ -1,0 +1,44 @@
+The patch is backported from the following commit:
+
+From 50f4862b069d58ade556aad90bd179206f10fdc1 Mon Sep 17 00:00:00 2001
+From: Takeshi KOMIYA <i.tkomiya@gmail.com>
+Date: Mon, 15 Feb 2016 11:46:30 +0900
+Subject: [PATCH] Fix some testcase get error with pygments-2.1.1
+
+---
+ tests/test_build_html.py | 16 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_build_html.py b/tests/test_build_html.py
+index 0c2efe4..737f8b0 100644
+--- a/tests/test_build_html.py
++++ b/tests/test_build_html.py
+@@ -311,14 +311,24 @@ def check_xpath(etree, fname, path, check):
+         # only check for node presence
+         pass
+     else:
++        def get_text(node):
++            if node.text is not None:
++                return node.text
++            else:
++                # Since pygments-2.1.1, empty <span> tag is inserted at top of
++                # highlighting block
++                if len(node) == 1 and node[0].tag == 'span' and node[0].text is None:
++                    return node[0].tail
++                else:
++                    return ''
+         rex = re.compile(check)
+         for node in nodes:
+-            if node.text and rex.search(node.text):
++            if get_text(node) and rex.search(get_text(node)):
+                 break
+         else:
+             assert False, ('%r not found in any node matching '
+                            'path %s in %s: %r' % (check, path, fname,
+-                           [node.text for node in nodes]))
++                           [get_text(node) for node in nodes]))
+ 
+ def check_static_entries(outdir):
+     staticdir = outdir / '_static'
+-- 
+2.13.3

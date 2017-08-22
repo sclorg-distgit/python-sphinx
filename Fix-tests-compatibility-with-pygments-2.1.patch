@@ -1,0 +1,26 @@
+The patch is backported from the following commit:
+
+From 5574aba60ed76f2bae947722122ac4d71ab8ed5a Mon Sep 17 00:00:00 2001
+From: Takeshi KOMIYA <i.tkomiya@gmail.com>
+Date: Mon, 18 Jan 2016 12:38:02 +0900
+Subject: [PATCH] Fix tests are broken with pygments-2.1
+
+---
+ tests/test_build_html.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_build_html.py b/tests/test_build_html.py
+index 0c2efe4..737f8b0 100644
+--- a/tests/test_build_html.py
++++ b/tests/test_build_html.py
+@@ -263,7 +263,7 @@ HTML_XPATH = {
+ 
+ if pygments:
+     HTML_XPATH['includes.html'].extend([
+-        (".//pre/span[@class='s']", u'üöä'),
++        (".//pre/span[@class='s2']", u'üöä'),
+         (".//div[@class='inc-pyobj1 highlight-text']//pre",
+             r'^class Foo:\n    pass\n\s*$'),
+         (".//div[@class='inc-pyobj2 highlight-text']//pre",
+-- 
+2.13.3
